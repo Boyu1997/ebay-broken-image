@@ -16,18 +16,18 @@ def parse_item_ebay(item):
     # image link exist in two form
     # if attribute 'data-src' exist, it contains image link
     # if not, 'src' contains image link
-    pic_link = item.find(class_='s-item__image-img')
-    if pic_link.has_attr('data-src'):
-        pic_link = pic_link.attrs['data-src']
+    img_link = item.find(class_='s-item__image-img')
+    if img_link.has_attr('data-src'):
+        img_link = img_link.attrs['data-src']
     else:
-        pic_link = pic_link.attrs['src']
+        img_link = img_link.attrs['src']
 
     price = item.find(class_="s-item__price").text
     name = item.find(class_="s-item__title").text
 
     return {
         'product_link': product_link,
-        'pic_link': pic_link,
+        'img_link': img_link,
         'price': price,
         'name': name,
     }
