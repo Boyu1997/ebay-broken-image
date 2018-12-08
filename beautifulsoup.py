@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 import requests
 import flask
+import re
 
 def ebay_url(keyword, page):
     ROOT = 'https://www.ebay.com/sch/i.html?'
@@ -11,9 +12,19 @@ def ebay_url(keyword, page):
 
 def parse_item_ebay(item):
     product_link = item.find(class_="s-item__link").attrs['href']
-    pic_link = item.find(class_='s-item__image-img').attrs['src']
+
+    # image link exist in two form
+    # if attribute 'data-src' exist, it contains image link
+    # if not, 'src' contains image link
+    pic_link = item.find(class_='s-item__image-img')
+    if pic_link.has_attr('data-src'):
+        pic_link = pic_link.attrs['data-src']
+    else:
+        pic_link = pic_link.attrs['src']
+
     price = item.find(class_="s-item__price").text
     name = item.find(class_="s-item__title").text
+
     return {
         'product_link': product_link,
         'pic_link': pic_link,
@@ -44,7 +55,7 @@ def main(request):
     page_response = requests.get(page_link, headers=headers).text
     page_content = BeautifulSoup(page_response, "html.parser")
 
-    search_results = page_content.find(class_='srp-results').find_all(class_='s-item')
+    search_results = page_content.find(class_='srp-results srp-grid clearfix').find_all(class_='s-item')
 
     for item in search_results:
         result.append(parse_item_ebay(item))
