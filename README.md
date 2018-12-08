@@ -32,8 +32,8 @@ This application is deployment ready for Google Cloud Platform (GCP) Python Runt
 
 
 ## Authors
-* **Boyu Jiang** - *Initial work* - [GitHub](https://github.com/Boyu1997)
-* **Qiusu Wang** - *Initial work* - [GitHub](https://github.com/qiusuw)
+* **Boyu Jiang** (Minerva class of 2020) - *Initial work* - [GitHub](https://github.com/Boyu1997)
+* **Qiusu Wang** (Minerva class of 2020) - *Initial work* - [GitHub](https://github.com/qiusuw)
 
 
 ## License
