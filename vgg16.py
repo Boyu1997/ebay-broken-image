@@ -34,7 +34,7 @@ def main(request):
     print ("Total {:d} image data".format(len(img_set)))
     X = np.array(img_set)
     model = VGG16(weights='imagenet', include_top=False, input_shape=(100,100,3))
-    features = model.predict(X)
-    features = features.tolist()
+    feature = model.predict(X)
+    feature = feature.tolist()
 
-    return flask.jsonify(features)
+    return flask.jsonify(feature)

@@ -2,6 +2,7 @@ from beautifulsoup import main as beautifulsoup
 from vgg16 import main as vgg16
 from flask import request
 import flask
+import numpy as np
 
 app = flask.Flask(__name__)
 
@@ -15,4 +16,7 @@ with app.test_request_context(method='POST'):
 with app.test_request_context(method='POST'):
     request.args = {'data': data}
     response = vgg16(request)
-    data = response.get_json()
+    feature = response.get_json()
+
+feature = np.array(feature)
+print (feature.shape)
