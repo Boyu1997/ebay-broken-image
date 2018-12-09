@@ -1,5 +1,5 @@
-from beautifulsoup.beautifulsoup import main as beautifulsoup
-from vgg16.vgg16 import main as vgg16
+from beautifulsoup.main import ebay_beautifulsoup as beautifulsoup
+from vgg16.main import ebay_vgg16 as vgg16
 from flask import request
 import flask
 import numpy as np

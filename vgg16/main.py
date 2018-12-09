@@ -14,7 +14,7 @@ def get_image_data(img_link):
     data = data.reshape(224, 224, 3)
     return data
 
-def main(request):
+def ebay_vgg16(request):
     if request is None:
         return None
     else:
