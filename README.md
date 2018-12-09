@@ -24,6 +24,16 @@ python main.py
 ## Deployment
 This application is deployment ready for Google Cloud Platform (GCP) Python Runtime Function.
 
+In ```beautifulsoup``` directory run
+```
+gcloud functions deploy ebay_beautifulsoup --runtime python37 --trigger-http
+```
+
+In ```vgg16``` directory run
+```
+gcloud functions deploy ebay_vgg16 --runtime python37 --trigger-http
+```
+
 
 ## Built With
 * [Flask](http://flask.pocoo.org/) - Web application microframework
