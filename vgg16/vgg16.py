@@ -9,9 +9,9 @@ def get_image_data(img_link):
     response = requests.get(img_link)
     img = Image.open(BytesIO(response.content))
     img = img.convert('RGB')
-    img = img.resize((100,100))
+    img = img.resize((224,224))
     data = np.array(list(img.getdata()))
-    data = data.reshape(100, 100, 3)
+    data = data.reshape(224, 224, 3)
     return data
 
 def main(request):
@@ -33,8 +33,10 @@ def main(request):
 
     print ("Total {:d} image data".format(len(img_set)))
     X = np.array(img_set)
-    model = VGG16(weights='imagenet', include_top=False, input_shape=(100,100,3))
+    model = VGG16(weights='imagenet', include_top=False, input_shape=(224,224,3))
     feature = model.predict(X)
+    # second_last = model.layers[-2].output
+    # print (second_last)
     feature = feature.tolist()
 
     return flask.jsonify(feature)
