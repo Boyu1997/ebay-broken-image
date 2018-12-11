@@ -43,7 +43,6 @@ gcloud functions deploy ebay_vgg16 --runtime python37 --trigger-http
 
 ## Authors
 * **Boyu Jiang** (Minerva class of 2020) - *Initial work* - [GitHub](https://github.com/Boyu1997)
-* **Qiusu Wang** (Minerva class of 2020) - *Initial work* - [GitHub](https://github.com/qiusuw)
 
 
 ## License
@@ -53,3 +52,4 @@ gcloud functions deploy ebay_vgg16 --runtime python37 --trigger-http
 ## Acknowledgments
 * **Mercari Euro Hack 2018** - *Project ideation* - [WebPage](https://challengerocket.com/mercari)
 * **Jeff Cui** (Minerva class of 2019) - *Project ideation* - [GitHub](https://github.com/jeffacce)
+* **Qiusu Wang** (Minerva class of 2020) - *Project ideation* - [GitHub](https://github.com/qiusuw)
