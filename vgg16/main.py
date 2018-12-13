@@ -9,7 +9,7 @@ from flask import request
 import json
 import pandas as pd
 
-from gcp_mlengine import ml_predict
+from gcp_mlengine_request import ml_predict
 
 def get_image_data(img_link):
     response = requests.get(img_link)
@@ -58,12 +58,14 @@ def ebay_vgg16(request, local=False, local_data=False):
         # define Clould ML identifier
         projectID = 'vertical-sunset-186521'
         modelID = 'ebay_vgg16_mlengine'
-        versionID = 'v_2018_12_05'
+        versionID = 'v_2018_12_13_07_14'
 
         feature = []
+        print ("{:d} iamge to process".format(img_set.shape[0]))
         for i in range(img_set.shape[0]):
-            instances = img_set[i].tolist()
+            instances = (img_set[i]).tolist()
             this_prediction = ml_predict(instances, projectID, modelID, versionID)
+            print ("image {:d} completed".format(i))
             feature.append(this_prediction)
 
         return
