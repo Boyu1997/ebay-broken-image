@@ -1,12 +1,20 @@
 import requests
 
+# Clould ML identifier
 project_region = "us-central1"
-project_id = "vertical-sunset-186521"
+project_id = 'vertical-sunset-186521'
+
+
+def get_vgg16_feature(data):
+    return cloud_function_request("ebay_vgg16", data)
+
 
 def cloud_function_request(function_name, payload):
     request_url = "https://{:s}-{:s}.cloudfunctions.net/{:s}".format(project_region, project_id, function_name)
     response = requests.post(request_url, json=payload)
-    return response
+    response_json = response.json()
+    return response_json
+
 
 def get_request(request, key, default):
     request_json = request.get_json()

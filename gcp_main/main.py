@@ -1,13 +1,14 @@
 import requests
 import flask
 import json
+from multiprocessing.dummy import Pool
 
-from gcp_request import get_request, cloud_function_request
+from gcp_request import get_request, cloud_function_request, get_vgg16_feature
 
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 10
+    data_count = 50
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -18,42 +19,18 @@ def ebay_broken_image(request):
 
     # beautifulsoup web scraper
     payload = {'keyword': keyword, 'data_count': data_count}
-    response = cloud_function_request("ebay_beautifulsoup", payload)
-    data_set = response.json()
+    data_set = cloud_function_request("ebay_beautifulsoup", payload)
 
+    pool = Pool(50)
+
+    feature_set = pool.map(get_vgg16_feature, enumerate(data_set))
+    pool.close()
+    pool.join()
+
+    feature_set = sorted(feature_set, key=lambda x: x['id'])
 
     for i in range(len(data_set)):
-        # pillow download image data
-        payload = {"id": data_set[i]["id"], "img_link": data_set[i]["img_link"]}
-        response = cloud_function_request("ebay_pillow", payload)
-        image_data = response.json()
-
-        # pillow download image data
-        payload = {"id": image_data["id"], "img_data": image_data["img_data"]}
-        response = cloud_function_request("ebay_vgg16", payload)
-        vgg16_data = response.json()
-
-        data_set[i]["vgg16"] = vgg16_data["vgg16"]
-
-
+        data_set[i]["vgg16"] = feature_set[i]["vgg16"]
 
 
     return flask.jsonify(data_set)
-
-    #
-    # download_data = json.loads(download_response.text)
-    #
-    # # beautifulsoup web scraper
-    # request_url = cloud_function_url("ebay_pillow")
-    #
-    # # download image
-    # download_api_url = "https://us-central1-vertical-sunset-186521.cloudfunctions.net/ebay-download-image"
-    #
-    # for i in range(len(data_set)):
-    #     payload = {'id': i, 'img_link': data_set[i]["img_link"]}
-    #     download_response = requests.post(download_api_url, json=payload)
-    #     download_data = json.loads(download_response.text)
-    #     data_set[i]["id"] = download_data["id"]
-    #     data_set[i]["img_data"] = download_data["img_data"]
-    #
-    # return flask.jsonify(data_set)
