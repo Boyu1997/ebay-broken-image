@@ -2,7 +2,7 @@ import requests
 import flask
 import json
 
-from gcp_request import get_request, cloud_function_url
+from gcp_request import get_request, cloud_function_request
 
 def ebay_broken_image(request):
     # set default keyward as 'hat'
@@ -17,10 +17,19 @@ def ebay_broken_image(request):
         search_stop = get_request(request, 'search_stop', search_stop)
 
     # beautifulsoup web scraper
-    request_url = cloud_function_url("ebay_beautifulsoup")
     payload = {'keyword': keyword, 'search_stop': search_stop}
-    response = requests.post(request_url, json=payload)
+    response = cloud_function_request("ebay_beautifulsoup", payload)
     data_set = response.json()
+
+
+    for i in range(len(data_set)):
+
+        # pillow download image data
+        payload = {}
+        response = cloud_function_request("ebay_pillow", payload)
+
+
+
 
     return flask.jsonify(data_set)
 
