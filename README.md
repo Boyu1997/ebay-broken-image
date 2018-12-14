@@ -15,18 +15,24 @@ pip install requirements.txt
 ```
 
 ### Testing
-To run this application locally
-```
-python main.py
-```
-
+*local testing goes here*
 
 ## Deployment
 This application is deployment ready for Google Cloud Platform (GCP) Python Runtime Function.
 
+Export GCP credential
+```
+export GOOGLE_APPLICATION_CREDENTIALS="PASS_TO_CREDENTIAL_FILE"
+```
+
 In ```beautifulsoup``` directory run
 ```
 gcloud functions deploy ebay_beautifulsoup --runtime python37 --trigger-http
+```
+
+In ```pillow``` directory run
+```
+gcloud functions deploy ebay_pillow --runtime python37 --trigger-http
 ```
 
 In ```vgg16``` directory run
