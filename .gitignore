@@ -3,6 +3,9 @@
 .AppleDouble
 .LSOverride
 
+# GCP flies
+gcp-account-file.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -117,4 +120,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-vgg16/gcp-account-file.json
