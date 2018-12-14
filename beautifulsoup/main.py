@@ -3,61 +3,47 @@ from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 import requests
 import flask
-import re
+import json
 
-def ebay_url(keyword, page):
-    ROOT = 'https://www.ebay.com/sch/i.html?'
-    url = ROOT + urlencode({'_nkw': keyword, '_pgn': page})
-    return url
-
-def parse_item_ebay(item):
-    product_link = item.find(class_="s-item__link").attrs['href']
-
-    # image link exist in two form
-    # if attribute 'data-src' exist, it contains image link
-    # if not, 'src' contains image link
-    img_link = item.find(class_='s-item__image-img')
-    if img_link.has_attr('data-src'):
-        img_link = img_link.attrs['data-src']
-    else:
-        img_link = img_link.attrs['src']
-
-    price = item.find(class_="s-item__price").text
-    name = item.find(class_="s-item__title").text
-
-    return {
-        'product_link': product_link,
-        'img_link': img_link,
-        'price': price,
-        'name': name,
-    }
+from gcp_request import get_request
+from parse import parse_item_ebay, ebay_url
 
 headers = {
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
 }
 
 def ebay_beautifulsoup(request):
-    # set default keyward as 'hat'
+    # default keyward for testing
     keyword = "hat"
+    search_stop = 30
 
     # if keyward passed by the request object, update keyward
     if request is not None:
-        request_json = request.get_json()
-        if request.args and 'keyword' in request.args:
-            keyword = request.args.get('keyword')
-        elif request_json and 'keyword' in request_json:
-            keyword = request_json['keyword']
 
-    result = []
+        # get keyword
+        keyword = get_request(request, 'keyword', keyword)
+        search_stop = get_request(request, 'search_stop', search_stop)
+
+    # initialize parameters
+    data_set = []
     i = 1
 
-    page_link = ebay_url(keyword, i)
-    page_response = requests.get(page_link, headers=headers).text
-    page_content = BeautifulSoup(page_response, "html.parser")
+    # keep searching next page
+    while True:
 
-    search_results = page_content.find(class_='srp-results srp-grid clearfix').find_all(class_='s-item')
+        # stop when have enough data
+        if len(data_set) > search_stop:
+            break
 
-    for item in search_results:
-        result.append(parse_item_ebay(item))
+        page_link = ebay_url(keyword, i)
+        page_response = requests.get(page_link, headers=headers).text
+        page_content = BeautifulSoup(page_response, "html.parser")
 
-    return flask.jsonify(result)
+        if page_content.find(class_='srp-results') is not None:
+            search_results = page_content.find(class_='srp-results srp-grid clearfix').find_all(class_='s-item')
+            for item in search_results:
+                data_set.append(parse_item_ebay(item))
+        else:
+            break
+
+    return flask.jsonify(data_set)
