@@ -15,24 +15,24 @@ headers = {
 def ebay_beautifulsoup(request):
     # default keyward for testing
     keyword = "hat"
-    search_stop = 30
+    data_count = 30
 
     # if keyward passed by the request object, update keyward
     if request is not None:
 
         # get keyword
         keyword = get_request(request, 'keyword', keyword)
-        search_stop = get_request(request, 'search_stop', search_stop)
+        data_count = get_request(request, 'data_count', data_count)
 
     # initialize parameters
-    data_set = []
+    parse_set = []
     i = 1
 
     # keep searching next page
     while True:
 
         # stop when have enough data
-        if len(data_set) > search_stop:
+        if len(parse_set) > data_count:
             break
 
         page_link = ebay_url(keyword, i)
@@ -42,8 +42,15 @@ def ebay_beautifulsoup(request):
         if page_content.find(class_='srp-results') is not None:
             search_results = page_content.find(class_='srp-results srp-grid clearfix').find_all(class_='s-item')
             for item in search_results:
-                data_set.append(parse_item_ebay(item))
+                parse_set.append(parse_item_ebay(item))
         else:
             break
+
+    # select requested amount of data, add "id" field
+    data_set = []
+    for i in range(data_count):
+        entry = parse_set[i]
+        entry["id"] = i
+        data_set.append(entry)
 
     return flask.jsonify(data_set)

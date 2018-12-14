@@ -2,25 +2,41 @@ import requests
 import flask
 import json
 
-from gcp_request import get_request, cloud_function_url
+from gcp_request import get_request, cloud_function_request
 
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    search_stop = 30
+    data_count = 10
 
     # if keyward passed by the request object, update keyward
     if request is not None:
 
         # get keyword
         keyword = get_request(request, 'keyword', keyword)
-        search_stop = get_request(request, 'search_stop', search_stop)
+        data_count = get_request(request, 'data_count', data_count)
 
     # beautifulsoup web scraper
-    request_url = cloud_function_url("ebay_beautifulsoup")
-    payload = {'keyword': keyword, 'search_stop': search_stop}
-    response = requests.post(request_url, json=payload)
+    payload = {'keyword': keyword, 'data_count': data_count}
+    response = cloud_function_request("ebay_beautifulsoup", payload)
     data_set = response.json()
+
+
+    for i in range(len(data_set)):
+        # pillow download image data
+        payload = {"id": data_set[i]["id"], "img_link": data_set[i]["img_link"]}
+        response = cloud_function_request("ebay_pillow", payload)
+        image_data = response.json()
+
+        # pillow download image data
+        payload = {"id": image_data["id"], "img_data": image_data["img_data"]}
+        response = cloud_function_request("ebay_vgg16", payload)
+        vgg16_data = response.json()
+
+        data_set[i]["vgg16"] = vgg16_data["vgg16"]
+
+
+
 
     return flask.jsonify(data_set)
 
