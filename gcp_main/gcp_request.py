@@ -1,3 +1,5 @@
+import requests
+
 project_region = "us-central1"
 project_id = "vertical-sunset-186521"
 

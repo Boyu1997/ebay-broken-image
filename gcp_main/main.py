@@ -7,7 +7,7 @@ from gcp_request import get_request, cloud_function_request
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 30
+    data_count = 10
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -23,7 +23,6 @@ def ebay_broken_image(request):
 
 
     for i in range(len(data_set)):
-
         # pillow download image data
         payload = {"id": data_set[i]["id"], "img_link": data_set[i]["img_link"]}
         response = cloud_function_request("ebay_pillow", payload)
@@ -33,6 +32,8 @@ def ebay_broken_image(request):
         payload = {"id": image_data["id"], "img_data": image_data["img_data"]}
         response = cloud_function_request("ebay_vgg16", payload)
         vgg16_data = response.json()
+
+        data_set[i]["vgg16"] = vgg16_data["vgg16"]
 
 
 

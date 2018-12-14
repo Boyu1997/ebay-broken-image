@@ -40,6 +40,10 @@ In ```vgg16``` directory run
 gcloud functions deploy ebay_vgg16 --runtime python37 --trigger-http
 ```
 
+In ```gcp_main``` directory run
+```
+gcloud functions deploy ebay_broken_image --runtime python37 --trigger-http
+```
 
 ## Built With
 * [Flask](http://flask.pocoo.org/) - Web application microframework
