@@ -9,10 +9,14 @@ def ebay_vgg16(request):
     # if keyward passed by the request object, update keyward
     if request is not None:
         # get keyword
+        id = get_request(request, 'id')
         img_data = get_request(request, 'img_data')
 
     # conver image into feature using vgg16
     instances = img_data
     prediction = ml_predict(instances)
 
-    return flask.jsonify(prediction)
+    return flask.jsonify({
+        "id": id,
+        "vgg16": prediction[0]["scores"],
+    })
