@@ -1,13 +1,14 @@
 import requests
 import flask
 import json
+from multiprocessing import Pool
 
-from gcp_request import get_request, cloud_function_request
+from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
 
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 10
+    data_count = 50
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -18,42 +19,46 @@ def ebay_broken_image(request):
 
     # beautifulsoup web scraper
     payload = {'keyword': keyword, 'data_count': data_count}
-    response = cloud_function_request("ebay_beautifulsoup", payload)
-    data_set = response.json()
+    data_set = cloud_function_request("ebay_beautifulsoup", payload)
+
+    p1 = Pool(20)
+    image_set = p1.map(image_download, enumerate(data_set))
+    p1.close()
+    p1.join()
+
+    # prep subset for multiprocessing vgg16 feature extraction
+    # [{"id": (int), "img_data": (array)} * 20]
+    # subset size of 20 keep below maximum input size
+    count = 0
+    vgg16_pool_set = []
+    while True:
+        if count + 20 >= len(image_set):
+            break
+        subset = []
+        for i in range(count, count+20):
+            subset.append(image_set[i])
+        vgg16_pool_set.append({"dataset": subset})
+        count += 20
+
+    # handel the remainder of the data
+    subset = []
+    for i in range(count, len(image_set)):
+        subset.append(image_set[i])
+    vgg16_pool_set.append({"dataset": subset})
 
 
+    p2 = Pool(10)
+    vgg16_set = p2.map(vgg_16_feature, enumerate(vgg16_pool_set))
+    p2.close()
+    p2.join()
+
+
+    prediction = []
+    for v in vgg16_set:
+        prediction += v["vgg16_set"]
+    prediction = sorted(prediction, key=lambda x: x['id'])
     for i in range(len(data_set)):
-        # pillow download image data
-        payload = {"id": data_set[i]["id"], "img_link": data_set[i]["img_link"]}
-        response = cloud_function_request("ebay_pillow", payload)
-        image_data = response.json()
-
-        # pillow download image data
-        payload = {"id": image_data["id"], "img_data": image_data["img_data"]}
-        response = cloud_function_request("ebay_vgg16", payload)
-        vgg16_data = response.json()
-
-        data_set[i]["vgg16"] = vgg16_data["vgg16"]
-
-
+        data_set[i]["vgg16"] = prediction[i]["vgg16"]
 
 
     return flask.jsonify(data_set)
-
-    #
-    # download_data = json.loads(download_response.text)
-    #
-    # # beautifulsoup web scraper
-    # request_url = cloud_function_url("ebay_pillow")
-    #
-    # # download image
-    # download_api_url = "https://us-central1-vertical-sunset-186521.cloudfunctions.net/ebay-download-image"
-    #
-    # for i in range(len(data_set)):
-    #     payload = {'id': i, 'img_link': data_set[i]["img_link"]}
-    #     download_response = requests.post(download_api_url, json=payload)
-    #     download_data = json.loads(download_response.text)
-    #     data_set[i]["id"] = download_data["id"]
-    #     data_set[i]["img_data"] = download_data["img_data"]
-    #
-    # return flask.jsonify(data_set)

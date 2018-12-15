@@ -2,22 +2,20 @@ from oauth2client.client import GoogleCredentials
 from googleapiclient import discovery
 
 # Clould ML identifier
-projectID = 'vertical-sunset-186521'
-modelID = 'ebay_vgg16_mlengine'
-versionID = 'v_2018_12_13_07_14'
+project_id = 'vertical-sunset-186521'
+model_id = 'ebay_vgg16_mlengine'
+version_id = 'v_2018_12_14_17_00'
 
 def ml_predict(instances):
 
     # build a representation of the Google Cloud ML API
     ml = discovery.build('ml', 'v1')
-    name = 'projects/{}/models/{}'.format(projectID, modelID)
-    if versionID is not None:
-        name += '/versions/{}'.format(versionID)
+    name = 'projects/{}/models/{}/versions/{}'.format(project_id, model_id, version_id)
 
     # make the prediction request
     response = ml.projects().predict(
         name=name,
-        body={'instances': [instances]}
+        body={'instances': instances}
     ).execute()
 
     # handle exception
@@ -28,7 +26,7 @@ def ml_predict(instances):
     return response['predictions']
 
 
-def get_request(request, key, default=None):
+def get_request(request, key, default):
     request_json = request.get_json()
     if request.args and key in request.args:
         data = request.args.get(key)

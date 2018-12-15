@@ -1,2 +1,5 @@
 requests
 oauth2client
+Pillow
+numpy
+flask

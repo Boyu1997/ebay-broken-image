@@ -11,7 +11,7 @@ from tensorflow.contrib.session_bundle import exporter
 # very important to do this as a first thing
 K.set_learning_phase(0)
 
-model = VGG16(weights='imagenet', include_top=False)
+model = VGG16(weights='imagenet', include_top=False, input_shape=(64,64,3))
 # model = VGG16(weights='imagenet', include_top=False, input_shape=(100,100,3))
 
 export_path = 'save/'

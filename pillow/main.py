@@ -20,9 +20,9 @@ def ebay_pillow(request):
     response = requests.get(img_link)
     img = Image.open(BytesIO(response.content))
     img = img.convert('RGB')
-    img = img.resize((224,224))
+    img = img.resize((64,64))
     data = np.array(list(img.getdata()))
-    data = data.reshape(224, 224, 3)
+    data = data.reshape(64, 64, 3)
     data = data.tolist()
 
     return flask.jsonify({
