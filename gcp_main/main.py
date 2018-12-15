@@ -1,6 +1,7 @@
 import requests
 import flask
 import json
+import logging
 from multiprocessing import Pool
 
 from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
@@ -26,6 +27,8 @@ def ebay_broken_image(request):
     p1.close()
     p1.join()
 
+    logging.warn("Image download completed!")
+
     # prep subset for multiprocessing vgg16 feature extraction
     # [{"id": (int), "img_data": (array)} * 20]
     # subset size of 20 keep below maximum input size
@@ -46,12 +49,14 @@ def ebay_broken_image(request):
         subset.append(image_set[i])
     vgg16_pool_set.append({"dataset": subset})
 
+    logging.warn("Data processing completed!")
 
     p2 = Pool(10)
     vgg16_set = p2.map(vgg_16_feature, enumerate(vgg16_pool_set))
     p2.close()
     p2.join()
 
+    logging.warn("Feature extract completed!")
 
     prediction = []
     for v in vgg16_set:
