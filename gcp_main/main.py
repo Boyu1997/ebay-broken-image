@@ -2,14 +2,13 @@ import requests
 import flask
 import json
 from multiprocessing import Pool
-import logging
 
 from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
 
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 25
+    data_count = 50
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -22,7 +21,7 @@ def ebay_broken_image(request):
     payload = {'keyword': keyword, 'data_count': data_count}
     data_set = cloud_function_request("ebay_beautifulsoup", payload)
 
-    p1 = Pool(10)
+    p1 = Pool(20)
     image_set = p1.map(image_download, enumerate(data_set))
     p1.close()
     p1.join()
@@ -47,16 +46,12 @@ def ebay_broken_image(request):
         subset.append(image_set[i])
     vgg16_pool_set.append({"dataset": subset})
 
-    for m in vgg16_pool_set:
-        logging.warn(m)
 
-
-    p2 = Pool(5)
+    p2 = Pool(10)
     vgg16_set = p2.map(vgg_16_feature, enumerate(vgg16_pool_set))
     p2.close()
     p2.join()
 
-    logging.warn(vgg16_set)
 
     prediction = []
     for v in vgg16_set:
