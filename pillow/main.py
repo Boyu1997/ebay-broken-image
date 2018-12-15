@@ -3,6 +3,7 @@ import requests
 from io import BytesIO
 import numpy as np
 import flask
+import logging
 
 from gcp_request import get_request
 
@@ -10,6 +11,8 @@ def ebay_pillow(request):
     # default keyward for testing
     id = "1"
     img_link = "https://i.ebayimg.com/thumbs/images/m/m6ipZBqkTZxwJ0lPsG9UsOQ/s-l225.jpg"
+
+    logging.warn(request.get_json())
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -20,9 +23,9 @@ def ebay_pillow(request):
     response = requests.get(img_link)
     img = Image.open(BytesIO(response.content))
     img = img.convert('RGB')
-    img = img.resize((224,224))
+    img = img.resize((64,64))
     data = np.array(list(img.getdata()))
-    data = data.reshape(224, 224, 3)
+    data = data.reshape(64, 64, 3)
     data = data.tolist()
 
     return flask.jsonify({

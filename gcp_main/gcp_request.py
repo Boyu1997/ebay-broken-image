@@ -3,10 +3,20 @@ import requests
 # Clould ML identifier
 project_region = "us-central1"
 project_id = 'vertical-sunset-186521'
+model_id = 'ebay_vgg16_mlengine'
+version_id = 'v_2018_12_14_17_00'
 
 
-def get_vgg16_feature(data):
-    return cloud_function_request("ebay_vgg16", data)
+def image_download(map_object):
+    data = map_object[1]
+    response_json = cloud_function_request("ebay_pillow", data)
+    return response_json
+
+
+def vgg_16_feature(map_object):
+    data = map_object[1]
+    response_json = cloud_function_request("ebay_vgg16", data)
+    return response_json
 
 
 def cloud_function_request(function_name, payload):
