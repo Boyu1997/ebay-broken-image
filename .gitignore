@@ -4,7 +4,7 @@
 .LSOverride
 
 # GCP flies
-gcp-account-file.json
+gcp_service_account.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

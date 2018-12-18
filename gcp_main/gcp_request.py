@@ -2,9 +2,7 @@ import requests
 
 # Clould ML identifier
 project_region = "us-central1"
-project_id = 'vertical-sunset-186521'
-model_id = 'ebay_vgg16_mlengine'
-version_id = 'v_2018_12_14_17_00'
+project_id = 'rolling-salmon'
 
 
 def image_download(map_object):

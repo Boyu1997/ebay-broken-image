@@ -2,9 +2,10 @@ from oauth2client.client import GoogleCredentials
 from googleapiclient import discovery
 
 # Clould ML identifier
-project_id = 'vertical-sunset-186521'
-model_id = 'ebay_vgg16_mlengine'
+project_id = 'rolling-salmon'
+model_id = 'ebay_vgg16'
 version_id = 'v_2018_12_14_17_00'
+
 
 def ml_predict(instances):
 
@@ -26,7 +27,7 @@ def ml_predict(instances):
     return response['predictions']
 
 
-def get_request(request, key, default):
+def get_request(request, key, default=None):
     request_json = request.get_json()
     if request.args and key in request.args:
         data = request.args.get(key)

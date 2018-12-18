@@ -22,7 +22,10 @@ def ebay_broken_image(request):
     payload = {'keyword': keyword, 'data_count': data_count}
     data_set = cloud_function_request("ebay_beautifulsoup", payload)
 
-    p1 = Pool(20)
+    logging.warn("Web scriping completed!")
+
+    # download images
+    p1 = Pool(data_count)
     image_set = p1.map(image_download, enumerate(data_set))
     p1.close()
     p1.join()
@@ -49,8 +52,7 @@ def ebay_broken_image(request):
         subset.append(image_set[i])
     vgg16_pool_set.append({"dataset": subset})
 
-    logging.warn("Data processing completed!")
-
+    # call vgg16 ml engine
     p2 = Pool(10)
     vgg16_set = p2.map(vgg_16_feature, enumerate(vgg16_pool_set))
     p2.close()
