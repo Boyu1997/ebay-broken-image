@@ -1,7 +1,4 @@
-from PIL import Image
-import requests
-from io import BytesIO
-import numpy as np
+from google.cloud import storage
 
 import flask
 from flask import request
@@ -11,19 +8,23 @@ from gcp_request import ml_predict, get_request
 
 def ebay_vgg16(request):
 
-    dataset = get_request(request, "dataset")
+    storage_id = get_request(request, "storage_id")
+    start = get_request(request, "start")
+    end = get_request(request, "end")
 
-    image_set = []
-    id_set = []
-    for d in dataset:
-        image_set.append(d["img_data"])
-        id_set.append(d["id"])
+    client = storage.Client()
+    bucket = client.get_bucket('ebay_broken_image')
+    dataset = []
+
+    for i in range(start, end):
+        blob = bucket.blob('{}/img_{}.json'.format(storage_id, i))
+        dataset.append(json.loads(blob.download_as_string()))
 
     # conver image into feature using vgg16
-    prediction = ml_predict(image_set)
+    prediction = ml_predict(dataset)
 
     vgg16_set = []
     for i in range(len(prediction)):
-        vgg16_set.append({"id": id_set[i], "vgg16": prediction[i]["scores"]})
+        vgg16_set.append({"id": start + i, "vgg16": prediction[i]["scores"]})
 
     return flask.jsonify({"vgg16_set": vgg16_set})

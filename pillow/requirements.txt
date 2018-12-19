@@ -2,3 +2,4 @@ requests
 Pillow
 numpy
 flask
+google-cloud-storage

@@ -2,6 +2,9 @@ import requests
 import flask
 import json
 import logging
+import time
+import string
+import random
 from multiprocessing import Pool
 
 from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
@@ -9,7 +12,7 @@ from gcp_request import get_request, cloud_function_request, image_download, vgg
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 50
+    data_count = 100
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -20,41 +23,51 @@ def ebay_broken_image(request):
 
     # beautifulsoup web scraper
     payload = {'keyword': keyword, 'data_count': data_count}
-    data_set = cloud_function_request("ebay_beautifulsoup", payload)
+    data_set = cloud_function_request("ebay_beautifulsoup", payload).json()
 
     logging.warn("Web scriping completed!")
 
+    timestamp = time.strftime('%Y%m%d_%H%M%S', time.gmtime())
+    appendix = "".join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=5))
+    storage_id = 'data_{}_{}'.format(timestamp, appendix)
+
+    download_input = []
+    for i in range(data_count):
+        download_input.append({
+            "storage_id": storage_id,
+            "img_link": data_set[i]["img_link"],
+            "id": data_set[i]["id"],
+        })
+
     # download images
-    p1 = Pool(data_count)
-    image_set = p1.map(image_download, enumerate(data_set))
+    p1 = Pool(50)
+    p1.map(image_download, enumerate(download_input))
     p1.close()
     p1.join()
 
     logging.warn("Image download completed!")
 
-    # prep subset for multiprocessing vgg16 feature extraction
-    # [{"id": (int), "img_data": (array)} * 20]
-    # subset size of 20 keep below maximum input size
+    vgg_16_input = []
+
     count = 0
-    vgg16_pool_set = []
     while True:
-        if count + 20 >= len(image_set):
+        if count + 20 >= data_count:
+            vgg_16_input.append({
+                "storage_id": storage_id,
+                "start": count,
+                "end": data_count,
+            })
             break
-        subset = []
-        for i in range(count, count+20):
-            subset.append(image_set[i])
-        vgg16_pool_set.append({"dataset": subset})
+        vgg_16_input.append({
+            "storage_id": storage_id,
+            "start": count,
+            "end": count+20,
+        })
         count += 20
 
-    # handel the remainder of the data
-    subset = []
-    for i in range(count, len(image_set)):
-        subset.append(image_set[i])
-    vgg16_pool_set.append({"dataset": subset})
-
     # call vgg16 ml engine
-    p2 = Pool(10)
-    vgg16_set = p2.map(vgg_16_feature, enumerate(vgg16_pool_set))
+    p2 = Pool(5)
+    vgg16_set = p2.map(vgg_16_feature, enumerate(vgg_16_input))
     p2.close()
     p2.join()
 
