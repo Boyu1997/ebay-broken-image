@@ -2,3 +2,4 @@ requests
 numpy
 flask
 numpy
+scikit-learn
