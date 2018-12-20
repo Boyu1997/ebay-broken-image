@@ -14,17 +14,18 @@ from gcp_request import get_request, cloud_function_request, image_download, vgg
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 60
+    amount = 60
 
     # if keyward passed by the request object, update keyward
     if request is not None:
 
         # get keyword
         keyword = get_request(request, 'keyword', keyword)
-        data_count = get_request(request, 'data_count', data_count)
+        amount = get_request(request, 'amount', amount)
+        amount = int(amount)
 
     # beautifulsoup web scraper
-    payload = {'keyword': keyword, 'data_count': data_count}
+    payload = {'keyword': keyword, 'amount': amount}
     data_set = cloud_function_request("ebay_beautifulsoup", payload).json()
 
     logging.warn("Web scriping completed!")
@@ -34,7 +35,7 @@ def ebay_broken_image(request):
     storage_id = 'data_{}_{}'.format(timestamp, appendix)
 
     download_input = []
-    for i in range(data_count):
+    for i in range(amount):
         download_input.append({
             "storage_id": storage_id,
             "img_link": data_set[i]["img_link"],
@@ -51,21 +52,21 @@ def ebay_broken_image(request):
 
     vgg_16_input = []
 
-    count = 0
+    counter = 0
     while True:
-        if count + 20 >= data_count:
+        if counter + 20 >= amount:
             vgg_16_input.append({
                 "storage_id": storage_id,
-                "start": count,
-                "end": data_count,
+                "start": counter,
+                "end": amount,
             })
             break
         vgg_16_input.append({
             "storage_id": storage_id,
-            "start": count,
-            "end": count+20,
+            "start": counter,
+            "end": counter+20,
         })
-        count += 20
+        counter += 20
 
     # call vgg16 ml engine
     p2 = Pool(5)
@@ -95,4 +96,4 @@ def ebay_broken_image(request):
     for i in range(len(data_set)):
         data_set[i]["feature"] = pca_prediction[i]
 
-    return flask.jsonify(data_set)
+    return flask.jsonify({"data_set": data_set})

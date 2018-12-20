@@ -15,14 +15,14 @@ headers = {
 def ebay_beautifulsoup(request):
     # default keyward for testing
     keyword = "hat"
-    data_count = 30
+    amount = 30
 
     # if keyward passed by the request object, update keyward
     if request is not None:
 
         # get keyword
         keyword = get_request(request, 'keyword', keyword)
-        data_count = get_request(request, 'data_count', data_count)
+        amount = get_request(request, 'amount', amount)
 
     # initialize parameters
     parse_set = []
@@ -32,7 +32,7 @@ def ebay_beautifulsoup(request):
     while True:
 
         # stop when have enough data
-        if len(parse_set) > data_count:
+        if len(parse_set) > amount:
             break
 
         page_link = ebay_url(keyword, i)
@@ -48,7 +48,7 @@ def ebay_beautifulsoup(request):
 
     # select requested amount of data, add "id" field
     data_set = []
-    for i in range(data_count):
+    for i in range(amount):
         entry = parse_set[i]
         entry["id"] = i
         data_set.append(entry)
