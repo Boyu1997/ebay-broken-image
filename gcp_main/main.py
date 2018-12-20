@@ -96,4 +96,8 @@ def ebay_broken_image(request):
     for i in range(len(data_set)):
         data_set[i]["feature"] = pca_prediction[i]
 
-    return flask.jsonify({"data_set": data_set})
+    response = flask.jsonify({data_set})
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Headers', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST')
+    return response
