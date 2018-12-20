@@ -32,7 +32,7 @@ def ebay_broken_image(request):
 
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.gmtime())
     appendix = "".join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=5))
-    storage_id = 'data_{}_{}'.format(timestamp, appendix)
+    storage_id = 'data/{}_{}'.format(timestamp, appendix)
 
     download_input = []
     for i in range(amount):
