@@ -5,14 +5,16 @@ import logging
 import time
 import string
 import random
+import numpy as np
 from multiprocessing import Pool
+from sklearn.decomposition import PCA
 
 from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
 
 def ebay_broken_image(request):
     # set default keyward as 'hat'
     keyword = "hat"
-    data_count = 100
+    data_count = 60
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -40,7 +42,7 @@ def ebay_broken_image(request):
         })
 
     # download images
-    p1 = Pool(50)
+    p1 = Pool(30)
     p1.map(image_download, enumerate(download_input))
     p1.close()
     p1.join()
@@ -71,14 +73,26 @@ def ebay_broken_image(request):
     p2.close()
     p2.join()
 
-    logging.warn("Feature extract completed!")
+    logging.warn("Vgg16 feature extraction completed!")
 
     prediction = []
     for v in vgg16_set:
         prediction += v["vgg16_set"]
     prediction = sorted(prediction, key=lambda x: x['id'])
-    for i in range(len(data_set)):
-        data_set[i]["vgg16"] = prediction[i]["vgg16"]
 
+    for i in range(len(data_set)):
+        prediction[i] = prediction[i]["vgg16"]
+
+    prediction = np.array(prediction)
+    prediction = prediction.reshape(len(data_set), 2048)
+
+    pca = PCA(n_components=2)
+    pca_prediction = pca.fit_transform(prediction)
+
+    logging.warn("PCA reduction completed!")
+    pca_prediction = pca_prediction.tolist()
+
+    for i in range(len(data_set)):
+        data_set[i]["feature"] = pca_prediction[i]
 
     return flask.jsonify(data_set)
