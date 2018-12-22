@@ -63,3 +63,4 @@ gcloud functions deploy ebay_broken_image --runtime python37 --trigger-http
 * **Mercari Euro Hack 2018** - *Project ideation* - [WebPage](https://challengerocket.com/mercari)
 * **Jeff Cui** (Minerva class of 2019) - *Project ideation* - [GitHub](https://github.com/jeffacce)
 * **Qiusu Wang** (Minerva class of 2020) - *Project ideation* - [GitHub](https://github.com/qiusuw)
+* **Davi Frossard** (WebPost: VGG in TensorFlow)  - *Code reference* - [WebPage](http://www.cs.toronto.edu/~frossard/post/vgg16/)

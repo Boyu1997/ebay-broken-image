@@ -4,7 +4,7 @@ from googleapiclient import discovery
 # Clould ML identifier
 project_id = 'rolling-salmon'
 model_id = 'ebay_vgg16'
-version_id = 'v_2018_12_14_17_00'
+version_id = 'pool_5'
 
 
 def ml_predict(instances):
