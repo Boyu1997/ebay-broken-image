@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import './App.css';
-import logo from './logo.svg';
+import SearchBar from './SearchBar.js';
 import DisplayCard from './DisplayCard.js';
 
 import * as API from './API.js';
@@ -52,8 +52,9 @@ class App extends Component {
   render() {
     return (
       <div className='App'>
-        <header>
-        </header>
+        <div className='search-grid-container'>
+          <SearchBar />
+        </div>
         <div className='display-grid-container'>
           {this.state.data.map((d) => (
             <DisplayCard
