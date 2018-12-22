@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import './DisplayCard.css';
 
+import ExpandCard from './ExpandCard.js';
+
 class DisplayCard extends Component {
   state = {
     nearest: [],
@@ -27,17 +29,9 @@ class DisplayCard extends Component {
         </div>
 
         <div className="similar-expension-container">
-        {this.state.nearest.map((n) => (
-          <DisplayCard
-            key={n.id}
-            id={n.id}
-            imgLink={n.img_link}
-            name={n.name}
-            productLink={n.product_link}
-            price={n.price}
+          <ExpandCard
+            nearest={this.state.nearest}
           />
-
-        ))}
         </div>
       </div>
     );
@@ -45,18 +39,3 @@ class DisplayCard extends Component {
 }
 
 export default DisplayCard
-
-// <section class="image-grid">
-//     <article class="image__cell" id="expand-jump-1">
-//       <div class="image--basic">
-//         <a href="#expand-jump-1">
-//             <img class="basic__img" src="http://lorempixel.com/250/250/fashion/1" alt="Fashion 1" />
-//         </a>
-//         <div class="arrow--up"></div>
-//       </div>
-//       <div class="image--expand">
-//         <a href="#close-jump-1" class="expand__close"></a>
-//           <img class="image--large" src="http://lorempixel.com/400/400/fashion/1" alt="Fashion 1" />
-//       </div>
-//     </article>
-// </section>

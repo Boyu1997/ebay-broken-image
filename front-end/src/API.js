@@ -1,16 +1,6 @@
 const api = "https://us-central1-rolling-salmon.cloudfunctions.net/ebay_broken_image"
 
-// let token = localStorage.token
-// if (!token)
-//   token = localStorage.token = Math.random().toString(36).substr(-8)
-
-// const headers = {
-//   'Accept': 'application/json',
-//   'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-//   'Content-Type': 'application/json',
-// }
-
-export const search = (query) =>
+export const search = (keyword, modelVersion) =>
   fetch(`${api}`, {
     method: 'POST',
     headers: {
@@ -18,13 +8,9 @@ export const search = (query) =>
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      "keyword": query,
+      "keyword": keyword,
       "amount": 10,
+      "model_version": modelVersion,
      })
   }).then(res => res.json())
-    .then(data => data )
-
-
-// export const search = (query) =>
-//   fetch(api).then(res => res.json())
-//     .then(data => data.data_set )
+    .then(data => data)
