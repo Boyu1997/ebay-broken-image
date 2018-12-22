@@ -9,7 +9,7 @@ export const search = (keyword, modelVersion) =>
     },
     body: JSON.stringify({
       "keyword": keyword,
-      "amount": 10,
+      "amount": 80,
       "model_version": modelVersion,
      })
   }).then(res => res.json())
