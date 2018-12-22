@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import './SearchBar.css';
 
@@ -13,7 +12,14 @@ class DisplayCard extends Component {
       <div className="search-bar-container">
         <div style={{width: '9%', height: '48px'}}></div>
         <div style={{width: '20%', height: '48px', lineHeight: '48px'}}>
-            <a href="https://github.com/Boyu1997/ebay-broken-image" target="_blank" className="search-bar-title">eBay-broken-image</a>
+            <a
+              href="https://github.com/Boyu1997/ebay-broken-image"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="search-bar-title"
+            >
+              eBay-broken-image
+            </a>
         </div>
         <div className="search-box-container">
           <input

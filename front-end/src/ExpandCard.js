@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import './ExpandCard.css';
 
@@ -19,7 +18,7 @@ class ExpandCard extends Component {
         >
           {this.state.nearest.map((n) => (
             <div key={n.id} >
-              <img className="display-card-img" src={n.img_link} target="_blank" />
+              <img className="display-card-img" src={n.img_link} alt='broken' />
               <div className="display-card-text-container">
                 <p className="display-card-text-price">Distance from selected: {n.distance.toFixed(2)}</p>
               </div>

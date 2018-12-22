@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import './DisplayCard.css';
 
@@ -21,9 +20,16 @@ class DisplayCard extends Component {
           className="display-card"
           onClick={(event) => this.showClosest() }
         >
-          <img className="display-card-img" src={ this.props.imgLink } />
+          <img className="display-card-img" src={ this.props.imgLink } alt='broken' />
           <div className="display-card-text-container">
-            <a href={this.props.productLink} target="_blank" className="display-card-text-title">{ this.props.name }</a>
+            <a
+              href={this.props.productLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="display-card-text-title"
+            >
+              { this.props.name }
+            </a>
             <p className="display-card-text-price">{ this.props.price }</p>
           </div>
         </div>

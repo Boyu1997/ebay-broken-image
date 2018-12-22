@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import './App.css';
 import SearchBar from './SearchBar.js';
@@ -19,7 +18,7 @@ class App extends Component {
       wait: "",
     })
     API.search(keyword.trim(), modelVersion).then((payloads) => {
-      console.log(payloads.data_set);
+      console.log(payloads);
       this.setState({
         wait: "hidden",
         data: payloads,
@@ -85,7 +84,7 @@ class App extends Component {
 
           ))}
         </div>
-        <div class='foot-note'>
+        <div className='foot-note'>
           Boyu Jiang CS156 Final Project
         </div>
       </div>
