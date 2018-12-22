@@ -2,18 +2,10 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import './App.css';
-import 'antd/dist/antd.css';
+import logo from './logo.svg';
+import DisplayCard from './DisplayCard.js';
 
-import { Input } from 'antd';
-import { Layout, Menu, Breadcrumb } from 'antd';
-import { Row, Col } from 'antd';
-
-import * as API from './API.js'
-import DisplayCard from './DisplayCard.js'
-import DisplayModal from './DisplayModal.js'
-
-const Search = Input.Search;
-const { Header, Content, Footer } = Layout;
+import * as API from './API.js';
 
 class App extends Component {
   state = {
@@ -30,45 +22,75 @@ class App extends Component {
     })
   }
 
+  findClosest = (id) => {
+    var featureOfId = this.state.data[id].feature;
+    var distanceFromId = [];
+    this.state.data.map((d) => (
+      distanceFromId.push(
+        {
+          "id": d.id,
+          "distance": Math.pow(Math.pow((d.feature[0]-featureOfId[0]),2) +
+                                        Math.pow((d.feature[1]-featureOfId[1]),2), 0.5)
+        }
+      )
+    ));
+    // sort by distance
+    distanceFromId.sort(function(a, b) {
+      return ((a['distance'] < b['distance']) ? -1 : ((a['distance'] > b['distance']) ? 1 : 0));
+    });
+    distanceFromId = distanceFromId.slice(1, 6);
+
+    for (var i = 0; i < 5; i++) {
+      distanceFromId[i]['img_link'] = this.state.data[distanceFromId[i]['id']]['img_link'];
+      distanceFromId[i]['name'] = this.state.data[distanceFromId[i]['id']]['name'];
+      distanceFromId[i]['product_link'] = this.state.data[distanceFromId[i]['id']]['product_link'];
+      distanceFromId[i]['price'] = this.state.data[distanceFromId[i]['id']]['price'];
+    }
+    return distanceFromId;
+  }
+
   render() {
     return (
-      <Layout>
-        <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
-          <div className="logo" />
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={['2']}
-            style={{ lineHeight: '64px' }}
-          >
-            <Search
-              style={{ width: '60%', margin: '0px 12px 0px 12px' }}
-              placeholder="input search text"
-              enterButton="Search"
-              size="large"
-              onSearch={value => this.searchQuery(value)}
+      <div className='App'>
+        <header>
+        </header>
+        <div className='display-grid-container'>
+          {this.state.data.map((d) => (
+            <DisplayCard
+              key={d.id}
+              id={d.id}
+              imgLink={d.img_link}
+              name={d.name}
+              productLink={d.product_link}
+              price={d.price}
+              onFindClosest={this.findClosest}
             />
-          </Menu>
-        </Header>
-        <Content style={{ padding: '0 100px', marginTop: 64 }}>
-          <div style={{ background: '#fff', padding: 36, minHeight: 380 }}>
-             <Row align="bottom" justify="space-around space-between">
-               {this.state.data.map(d => (
-                 <Col span={6}>
-                  <DisplayCard data={d}/>
-                  <DisplayModal />
-                 </Col>
-               ))}
-             </Row>
-          </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          CS156 Final Project @ M20 Boyu Jiang
-        </Footer>
-      </Layout>
+
+          ))}
+        </div>
+        <p></p>
+      </div>
+
     );
   }
 }
+
+// <div className="App">
+//   <header className="App-header">
+//     <img src={logo} className="App-logo" alt="logo" />
+//     <p>
+//       Edit <code>src/App.js</code> and save to reload.
+//     </p>
+//     <a
+//       className="App-link"
+//       href="https://reactjs.org"
+//       target="_blank"
+//       rel="noopener noreferrer"
+//     >
+//       Learn React
+//     </a>
+//   </header>
+// </div>
 
 // #components-layout-demo-fixed .logo {
 //   width: 120px;
