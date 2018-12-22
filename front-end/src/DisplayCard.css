@@ -1,0 +1,52 @@
+.display-card-container {
+  width: 25%;
+}
+
+.display-card {
+  margin-left: auto;
+  margin-right: auto;
+  width: 220px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #e8e8e8;
+}
+
+.display-card:hover {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.display-card-img {
+  width: 220px;
+  height: 220px;
+}
+
+.display-card-text-container {
+  margin: 20px;
+}
+
+.display-card-text-price {
+  color: gba(0,0,0,0.45);
+
+}
+
+a {
+  text-decoration: none;
+  font-variant: tabular-nums;
+  color: rgba(0,0,0,0.85);
+}
+
+p {
+  font-variant: tabular-nums;
+  color: rgba(0,0,0,0.6);
+}
+
+
+@media screen and (max-width: 960px) {
+  .display-card {
+    width: 140px;
+  }
+  .display-card-img {
+    width: 140px;
+    height: 140px;
+  }
+}
