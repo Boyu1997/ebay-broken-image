@@ -4,15 +4,18 @@ import json
 import logging
 import time
 import string
-import random
+import hashlib
 import numpy as np
 from multiprocessing import Pool
 from sklearn.decomposition import PCA
 
-from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
+from gcp_request import get_request, cloud_function_request, image_download, vgg_16_predict
+
+from google.cloud import storage
 
 def ebay_broken_image(request):
 
+    # handel 'OPTIONS' request
     if request.method == 'OPTIONS':
         response = flask.Response()
         response.headers.set('Access-Control-Allow-Origin', '*')
@@ -20,9 +23,10 @@ def ebay_broken_image(request):
         response.headers.set('Access-Control-Allow-Methods', 'GET, POST')
         return (response)
 
-    # set default keyward as 'hat'
+    # set default
     keyword = "hat"
     amount = 60
+    model_version = "pool_5"
 
     # if keyward passed by the request object, update keyward
     if request is not None:
@@ -31,6 +35,7 @@ def ebay_broken_image(request):
         keyword = get_request(request, 'keyword', keyword)
         amount = get_request(request, 'amount', amount)
         amount = int(amount)
+        model_version = get_request(request, 'model_version', model_version)
 
     # beautifulsoup web scraper
     payload = {'keyword': keyword, 'amount': amount}
@@ -38,71 +43,69 @@ def ebay_broken_image(request):
 
     logging.warn("Web scriping completed!")
 
-    timestamp = time.strftime('%Y%m%d_%H%M%S', time.gmtime())
-    appendix = "".join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=5))
-    storage_id = 'data/{}_{}'.format(timestamp, appendix)
+    # generate hash as storage id
+    for i in range(len(data_set)):
+        data_set[i]['storage_id'] = hashlib.sha256(data_set[i]['img_link'].encode('utf-8')).hexdigest()
 
+    # check if images in cloud storage
+    client = storage.Client()
+    bucket = client.get_bucket('ebay_broken_image')
     download_input = []
-    for i in range(amount):
-        download_input.append({
-            "storage_id": storage_id,
-            "img_link": data_set[i]["img_link"],
-            "id": data_set[i]["id"],
-        })
+    for d in data_set:
+        blob = bucket.blob('image/{:s}.json'.format(d['storage_id']))
+        if not blob.exists():
+            download_input.append({
+                "storage_id": d['storage_id'],
+                "img_link": d["img_link"],
+                "id": d["id"],
+            })
 
-    # download images
+    # download images not in cloud storage
     p1 = Pool(30)
     p1.map(image_download, enumerate(download_input))
     p1.close()
     p1.join()
 
-    logging.warn("Image download completed!")
+    logging.warn("All images in cloud storage!")
 
+    # check if model prediction in cloud storage
     vgg_16_input = []
-
-    counter = 0
-    while True:
-        if counter + 20 >= amount:
-            vgg_16_input.append({
-                "storage_id": storage_id,
-                "start": counter,
-                "end": amount,
+    counter = -1
+    for d in data_set:
+        blob = bucket.blob('prediction/{:s}/{:s}.json'.format(model_version, d['storage_id']))
+        if not blob.exists():
+            counter += 1
+            if counter % 20 == 0:
+                vgg_16_input.append([])
+            vgg_16_input[int(counter/20)].append({
+                "storage_id": d['storage_id'],
+                "model_version": model_version,
             })
-            break
-        vgg_16_input.append({
-            "storage_id": storage_id,
-            "start": counter,
-            "end": counter+20,
-        })
-        counter += 20
 
-    # call vgg16 ml engine
+    # predict for prediction not in cloud storage using vgg16 ml engine
     p2 = Pool(5)
-    vgg16_set = p2.map(vgg_16_feature, enumerate(vgg_16_input))
+    p2.map(vgg_16_predict, enumerate(vgg_16_input))
     p2.close()
     p2.join()
 
-    logging.warn("Vgg16 feature extraction completed!")
+    logging.warn("All VGG16 prediction in cloud storage!")
 
-    prediction = []
-    for v in vgg16_set:
-        prediction += v["vgg16_set"]
-    prediction = sorted(prediction, key=lambda x: x['id'])
+    feature_set = []
+    for d in data_set:
+        blob = bucket.blob('prediction/{:s}/{:s}.json'.format(model_version, d['storage_id']))
+        feature_set.append(json.loads(blob.download_as_string()))
 
-    for i in range(len(data_set)):
-        prediction[i] = prediction[i]["vgg16"]
-
-    prediction = np.array(prediction)
-    prediction = prediction.reshape(len(data_set), 2048)
+    feature_set = np.array(feature_set)
+    feature_set = feature_set.reshape(len(data_set), 2048)
 
     pca = PCA(n_components=2)
-    pca_prediction = pca.fit_transform(prediction)
+    pca_set = pca.fit_transform(feature_set)
 
     logging.warn("PCA reduction completed!")
-    pca_prediction = pca_prediction.tolist()
+    pca_set = pca_set.tolist()
 
     for i in range(len(data_set)):
-        data_set[i]["feature"] = pca_prediction[i]
+        data_set[i]["feature"] = pca_set[i]
 
     response = flask.jsonify(data_set)
     response.headers.set('Access-Control-Allow-Origin', '*')

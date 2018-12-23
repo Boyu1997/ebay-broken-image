@@ -50,7 +50,7 @@ def ebay_beautifulsoup(request):
 
     # select requested amount of data, add "id" field
     data_set = []
-    for i in range(amount):
+    for i in range(len(parse_set)):
         entry = parse_set[i]
         entry["id"] = i
         data_set.append(entry)

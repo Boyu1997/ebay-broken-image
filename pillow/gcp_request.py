@@ -1,4 +1,4 @@
-def get_request(request, key, default):
+def get_request(request, key, default=None):
     request_json = request.get_json()
     if request.args and key in request.args:
         data = request.args.get(key)

@@ -9,18 +9,14 @@ from google.cloud import storage
 from gcp_request import get_request
 
 def ebay_pillow(request):
-    # default keyward for testing
-    id = "test"
-    img_link = "https://i.ebayimg.com/thumbs/images/m/m6ipZBqkTZxwJ0lPsG9UsOQ/s-l225.jpg"
-    storage_id = "test"
 
-    # if keyward passed by the request object, update keyward
+    # get keyword
     if request is not None:
-        # get keyword
-        id = get_request(request, 'id', id)
-        img_link = get_request(request, 'img_link', img_link)
-        storage_id = get_request(request, 'storage_id', img_link)
+        id = get_request(request, 'id')
+        img_link = get_request(request, 'img_link')
+        storage_id = get_request(request, 'storage_id')
 
+    # download and resize image
     response = requests.get(img_link)
     img = Image.open(BytesIO(response.content))
     img = img.convert('RGB')
@@ -29,10 +25,10 @@ def ebay_pillow(request):
     data = data.reshape(64, 64, 3)
     data = data.tolist()
 
+    # save image to cloud storage
     client = storage.Client()
-
     bucket = client.get_bucket('ebay_broken_image')
-    blob = bucket.blob('{}/img_{}.json'.format(storage_id, id))
+    blob = bucket.blob('image/{:s}.json'.format(storage_id))
     blob.upload_from_string(json.dumps(data))
 
-    return "200"
+    return

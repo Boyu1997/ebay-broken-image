@@ -7,15 +7,14 @@ project_id = 'rolling-salmon'
 
 def image_download(map_object):
     data = map_object[1]
-    response = cloud_function_request("ebay_pillow", data)
-    return response
+    cloud_function_request("ebay_pillow", data)
+    return
 
 
-def vgg_16_feature(map_object):
+def vgg_16_predict(map_object):
     data = map_object[1]
-    response = cloud_function_request("ebay_vgg16", data)
-    response_json = response.json()
-    return response_json
+    cloud_function_request("ebay_vgg16", data)
+    return
 
 
 def cloud_function_request(function_name, payload):
