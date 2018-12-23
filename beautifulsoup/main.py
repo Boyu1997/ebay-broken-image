@@ -39,6 +39,8 @@ def ebay_beautifulsoup(request):
         page_response = requests.get(page_link, headers=headers).text
         page_content = BeautifulSoup(page_response, "html.parser")
 
+        i += 1
+
         if page_content.find(class_='srp-results') is not None:
             search_results = page_content.find(class_='srp-results srp-grid clearfix').find_all(class_='s-item')
             for item in search_results:

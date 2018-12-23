@@ -12,6 +12,14 @@ from sklearn.decomposition import PCA
 from gcp_request import get_request, cloud_function_request, image_download, vgg_16_feature
 
 def ebay_broken_image(request):
+
+    if request.method == 'OPTIONS':
+        response = flask.Response()
+        response.headers.set('Access-Control-Allow-Origin', '*')
+        response.headers.set('Access-Control-Allow-Headers', '*')
+        response.headers.set('Access-Control-Allow-Methods', 'GET, POST')
+        return (response)
+
     # set default keyward as 'hat'
     keyword = "hat"
     amount = 60
