@@ -23,7 +23,7 @@ class DisplayCard extends Component {
         </div>
         <div className="search-box-container">
           <input
-            placeholder="input search text (default: hat)"
+            placeholder="input search text"
             className="search-box-input"
             type="text"
             value={this.state.keyword}

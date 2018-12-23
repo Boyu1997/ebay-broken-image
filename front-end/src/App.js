@@ -14,6 +14,7 @@ class App extends Component {
   }
   searchQuery = (keyword, modelVersion) => {
     this.setState( {
+      data: [],
       info: "hidden",
       wait: "",
     })
