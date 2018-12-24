@@ -2,12 +2,11 @@ from oauth2client.client import GoogleCredentials
 from googleapiclient import discovery
 
 # Clould ML identifier
-project_id = 'rolling-salmon'
+project_id = 'boyu-io'
 model_id = 'ebay_vgg16'
-version_id = 'pool_5'
 
 
-def ml_predict(instances):
+def ml_predict(instances, version_id):
 
     # build a representation of the Google Cloud ML API
     ml = discovery.build('ml', 'v1')

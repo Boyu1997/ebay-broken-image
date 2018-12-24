@@ -15,15 +15,15 @@ def ebay_vgg16(request):
 
     # get image data from cloud storage
     image_set = []
-    for d in data_set:
-        blob = bucket.blob('image/{:s}.json'.format(d['storage_id']))
+    for d in data_set['storage_id']:
+        blob = bucket.blob('image/{:s}.json'.format(d))
         image_set.append(json.loads(blob.download_as_string()))
 
     # call VGG16 model for prediction
-    prediction = ml_predict(image_set)
+    prediction = ml_predict(image_set, data_set['model_version'])
 
     for i in range(len(prediction)):
-        blob = bucket.blob('prediction/{:s}/{:s}.json'.format(data_set[i]['model_version'], data_set[i]['storage_id']))
+        blob = bucket.blob('prediction/{:s}/{:s}.json'.format(data_set['model_version'], data_set['storage_id'][i]))
         blob.upload_from_string(json.dumps(prediction[i]["scores"]))
 
     return

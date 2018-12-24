@@ -1,4 +1,4 @@
-const api = "https://us-central1-rolling-salmon.cloudfunctions.net/ebay_broken_image"
+const api = "https://us-central1-boyu-io.cloudfunctions.net/ebay_broken_image"
 
 export const search = (keyword, modelVersion) =>
   fetch(`${api}`, {
