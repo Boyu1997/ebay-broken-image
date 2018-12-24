@@ -42,7 +42,7 @@ def ebay_beautifulsoup(request):
         i += 1
 
         # gather data from page
-        if page_content.find(class_='srp-results') is not None:
+        if page_content.find(class_='srp-results srp-grid clearfix') is not None:
             search_results = page_content.find(class_='srp-results srp-grid clearfix').find_all(class_='s-item')
             for item in search_results:
                 parse_set.append(parse_item_ebay(item))
