@@ -2,7 +2,7 @@ import requests
 
 # Clould ML identifier
 project_region = "us-central1"
-project_id = 'rolling-salmon'
+project_id = 'boyu-io'
 
 
 def image_download(map_object):

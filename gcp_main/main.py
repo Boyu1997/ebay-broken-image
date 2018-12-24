@@ -68,45 +68,58 @@ def ebay_broken_image(request):
 
     logging.warn("All images in cloud storage!")
 
-    # check if model prediction in cloud storage
-    vgg_16_input = []
-    counter = -1
-    for d in data_set:
-        blob = bucket.blob('prediction/{:s}/{:s}.json'.format(model_version, d['storage_id']))
-        if not blob.exists():
-            counter += 1
-            if counter % 20 == 0:
-                vgg_16_input.append([])
-            vgg_16_input[int(counter/20)].append({
-                "storage_id": d['storage_id'],
-                "model_version": model_version,
-            })
+    # generate random data for the control model
+    if model_version == "none":
+        random_pca_set = 600 * np.random.random_sample((len(data_set), 2)) - 300
+        random_pca_set = random_pca_set.tolist()
 
-    # predict for prediction not in cloud storage using vgg16 ml engine
-    p2 = Pool(5)
-    p2.map(vgg_16_predict, enumerate(vgg_16_input))
-    p2.close()
-    p2.join()
+        for i in range(len(data_set)):
+            data_set[i]["feature"] = random_pca_set[i]
 
-    logging.warn("All VGG16 prediction in cloud storage!")
+    # model processing
+    else:
 
-    feature_set = []
-    for d in data_set:
-        blob = bucket.blob('prediction/{:s}/{:s}.json'.format(model_version, d['storage_id']))
-        feature_set.append(json.loads(blob.download_as_string()))
+        # check if model prediction in cloud storage
+        vgg_16_input = []
+        counter = -1
+        for d in data_set:
+            blob = bucket.blob('prediction/{:s}/{:s}.json'.format(model_version, d['storage_id']))
+            if not blob.exists():
+                counter += 1
+                if counter % 20 == 0:
+                    vgg_16_input.append({
+                        "model_version": model_version,
+                        "storage_id": [],
+                    })
+                vgg_16_input[int(counter/20)]["storage_id"].append(d['storage_id'])
 
-    feature_set = np.array(feature_set)
-    feature_set = feature_set.reshape(len(data_set), 2048)
+        # predict for prediction not in cloud storage using vgg16 ml engine
+        p2 = Pool(5)
+        p2.map(vgg_16_predict, enumerate(vgg_16_input))
+        p2.close()
+        p2.join()
 
-    pca = PCA(n_components=2)
-    pca_set = pca.fit_transform(feature_set)
+        logging.warn("All VGG16 prediction in cloud storage!")
 
-    logging.warn("PCA reduction completed!")
-    pca_set = pca_set.tolist()
+        feature_set = []
+        for d in data_set:
+            blob = bucket.blob('prediction/{:s}/{:s}.json'.format(model_version, d['storage_id']))
+            feature_set.append(json.loads(blob.download_as_string()))
 
-    for i in range(len(data_set)):
-        data_set[i]["feature"] = pca_set[i]
+        feature_set = np.array(feature_set)
+        feature_set = feature_set.reshape(feature_set.shape[0],
+                                          feature_set.shape[1]*feature_set.shape[2]*feature_set.shape[3])
 
+        pca = PCA(n_components=2)
+        pca_set = pca.fit_transform(feature_set)
+
+        logging.warn("PCA reduction completed!")
+        pca_set = pca_set.tolist()
+
+        for i in range(len(data_set)):
+            data_set[i]["feature"] = pca_set[i]
+
+    # return response
     response = flask.jsonify(data_set)
     response.headers.set('Access-Control-Allow-Origin', '*')
     response.headers.set('Access-Control-Allow-Headers', '*')
