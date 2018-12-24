@@ -3,9 +3,6 @@
 .AppleDouble
 .LSOverride
 
-# GCP flies
-gcp_service_account.json
-
 # VGG16 Weight File
 vgg16_build/vgg16_weights.npz
 
