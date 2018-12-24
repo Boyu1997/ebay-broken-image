@@ -45,7 +45,8 @@ def ebay_broken_image(request):
 
     # generate hash as storage id
     for i in range(len(data_set)):
-        data_set[i]['storage_id'] = hashlib.sha256(data_set[i]['img_link'].encode('utf-8')).hexdigest()
+        img_link_hash = hashlib.sha256(data_set[i]['img_link'].encode('utf-8')).hexdigest()
+        data_set[i]['storage_id'] = "{:s}/{:s}".format(keyword.replace(" ", "_"), img_link_hash)
 
     # check if images in cloud storage
     client = storage.Client()
