@@ -1,5 +1,8 @@
 # ebay-broken-image
-*project description goes here*
+
+## Demo
+A live available at http://ebay-broken-image.boyu.io/
+Expect up to 5 minutes delay in response due to limited computational power.
 
 
 ## Getting Started
@@ -49,6 +52,7 @@ gcloud functions deploy ebay_broken_image --runtime python37 --trigger-http
 * [Flask](http://flask.pocoo.org/) - Web application microframework
 * [BeautifulSoup](https://pypi.org/project/beautifulsoup4/) - Web page information scraper
 * [Keras](https://keras.io/) - Open source neural network library
+* [TensorFlow](https://www.tensorflow.org/) - Open source neural network library
 
 
 ## Authors
