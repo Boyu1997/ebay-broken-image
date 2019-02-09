@@ -1,7 +1,7 @@
 # ebay-broken-image
 
 ## Demo
-A live available at http://ebay-broken-image.boyu.io/
+A live available at [ebay-broken-image.boyu.io](http://ebay-broken-image.boyu.io/)
 Expect up to 5 minutes delay in response due to limited computational power.
 
 
